@@ -1,0 +1,26 @@
+<html>
+         <head>
+             <title> Option Chain Dashboard</title>
+               <link  rel="stylesheet" href="/static/css/optionchain.css">
+              <script src="/static/js/optionchain.js" ></script>
+         </head>
+         <body>
+              <div class="formdiv" >
+                  <button type="button" id="nifty" name="index" value="NIFTY" onclick=getNseData("NIFTY")>NIFTY</button>
+                  <button type="button" id="banknifty" name="index" value="BANKNIFTY" onclick=getNseData("BANKNIFTY") >BANKNIFTY</button>
+                  <label for="expiry_date" name="expiry" > Expiry Date : {{expiryDate}}</label>
+              </div>
+              <div id="strike_price_chart"> Bar Chart
+                  <img src="data:image/png;base64, {{ img1 }}">
+              </div>
+              <div id="volumeChart">
+                  <img src="data:image/png;base64, {{ volumeChart }}">
+              </div>
+              <div id="callandput">
+                   <img src="data:image/png;base64, {{ volumeChart }}">
+              </div>
+              <div></div>
+
+
+         </body>
+</html>
