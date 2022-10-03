@@ -1,2 +1,2 @@
-web: gunicorn algoScalpingBuySell:app
-web: gunicorn run:app
+web:gunicorn algoTrading:app
+web:gunicorn run:app
