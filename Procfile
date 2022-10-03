@@ -1,1 +1,1 @@
-web: python algoScalpingBuySell.py --port=$PORT
+web: python algoScalpingBuySell.py --port=os.getenv("PORT")
