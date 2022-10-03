@@ -178,8 +178,8 @@ checkIfOrderExists()
 
 @app.route('/')
 def index():
-    #return render_template('html/algoscalping.html')
-    return render_template("Hi")
+    return render_template('html/algoscalping.html')
+    #return render_template("Hi")
 
 @app.route('/buy', methods=["GET", "POST"])
 def buyCE():
