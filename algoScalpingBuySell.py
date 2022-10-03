@@ -13,7 +13,7 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "D6rAjHBuDthXtMPe4rWg8X2hcjfHp1s6pnpp+4UcwxsAwTpNAVLuXe1xpm46oH+KEziRuGFvSZoJLJjsk4mCpuab2sXu4EPwFNdoWWyqUPcCsyDpJZKRAw=="
+enctoken = "4ckGfr/jl4HCNmZl+vhrnOkVTWQYsJh6TGxpy6vFTn+bfIeCqJ/UE/0zfeb1UdgsW6ElkMftCxEODz+tNH86f5zgmt08V99GxQ/WGv8ioDOF/sg/poneBw=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
@@ -21,7 +21,7 @@ current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
-lots = 1
+lots = 10
 qty = 50 * lots
 
 currentPremiumPlaced = ""
@@ -50,6 +50,7 @@ def getExpiryList():
         expiry_dates = option_data["records"]["expiryDates"]
         global current_expiry
         current_expiry = expiry_dates[0]
+        print(current_expiry)
         next_expiry = expiry_dates[1]
 
         if (str(current_expiry).split("-")[1] != (str(next_expiry).split("-")[1])):
@@ -61,36 +62,39 @@ def getExpiryList():
 
 def getExistingOrders():
     print("Existing Orders")
-    print(kite.positions())
+    return kite.positions()
 
 
 def placeCallOption():
+    exitOrder()
     # niftySpot = getCurrentAtm()
+    checkIfOrderExists()
     optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "CE"
-    global currentPremiumPlaced
-    currentPremiumPlaced = optionToBuy
     print(optionToBuy)
-    # order_id = kite.place_order(variety=kite.PRODUCT_MIS,
-    #                             tradingsymbol=optionToBuy,
-    #                             exchange=kite.EXCHANGE_NFO,
-    #                             transaction_type=kite.TRANSACTION_TYPE_BUY,
-    #                             quantity=qty,
-    #                             order_type=kite.ORDER_TYPE_MARKET,
-    #                             product=kite.PRODUCT_CNC,
-    #                             validity=kite.VALIDITY_DAY)
-    #print(order_id)
+    order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
+                                transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
+                                order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+    if order_id["status"] == "success":
+        if order_id["data"]["order_id"] != "":
+            global currentPremiumPlaced
+            currentPremiumPlaced = optionToBuy
+    print(order_id)
     print(currentPremiumPlaced + "call Option")
     getLTPForOption("Buy")
 
-
 def placePutOption():
+    exitOrder()
+    checkIfOrderExists()
     optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "PE"
     global currentPremiumPlaced
     currentPremiumPlaced = optionToBuy
-    # order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.PRODUCT_MIS, exchange=kite.EXCHANGE_NFO,
-    #                             transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
-    #                             order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_NRML)
-    #print(order_id)
+    order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
+                                transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
+                                order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+    if order_id["status"] == "success":
+        if order_id["data"]["order_id"] != "":
+            currentPremiumPlaced = optionToBuy
+    print(order_id)
     print(currentPremiumPlaced + "Put Option")
     getLTPForOption("Buy")
 
@@ -98,10 +102,11 @@ def placePutOption():
 def exitOrder():
     if currentPremiumPlaced != "":
         print(currentPremiumPlaced)
-        # order_id = kite.place_order(tradingsymbol=currentPremiumPlaced, variety=kite.PRODUCT_MIS,
-        #                             exchange=kite.EXCHANGE_NFO,
-        #                             transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-        #                             order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_NRML)
+        order_id = kite.place_order(tradingsymbol=currentPremiumPlaced, variety=kite.VARIETY_REGULAR,
+                                    exchange=kite.EXCHANGE_NFO,
+                                    transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
+                                    order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+        print(order_id)
         print(currentPremiumPlaced + "exit order")
         getLTPForOption("exit")
 
@@ -121,11 +126,11 @@ def getTradingSymbol():
     year = str(today.year)[2:4]
 
     if is_monthly_expiry:
-        month = str(today.strftime("%b")).upper()
+        month = str(current_expiry.split("-")[1]).upper()
         symbol = index_global + year + month
         print(symbol)
     else:
-        month = str(today.strftime("%b")).upper()[0]
+        month = str(current_expiry.split("-")[1]).upper()[0]
         next_thursday = rrule(freq=WEEKLY, dtstart=today, byweekday=TH, count=1)[0]
         date = str(next_thursday)[8:10]
         symbol = "" + index_global + year + month + date
@@ -150,11 +155,31 @@ def getLTPForOption(action):
         file.close()
         print("__________")
 
-getExistingOrders()
+
+def checkIfOrderExists():
+    position_string = json.dumps(getExistingOrders())
+    position_json = json.loads(position_string)
+    allDayPositions = position_json['day']
+    if allDayPositions != []:
+        for position in allDayPositions:
+            print(position['tradingsymbol'])
+            if position['tradingsymbol'] == currentPremiumPlaced:
+                if position['quantity'] >= 0:
+                    # print(position['last_price'])
+                    exitOrder()
+
+    else:
+        print("No day positions")
+    print()
+
+
+checkIfOrderExists()
+
+
 @app.route('/')
 def index():
     return render_template('html/algoscalping.html')
-
+    #return render_template("Hi")
 
 @app.route('/buy', methods=["GET", "POST"])
 def buyCE():
