@@ -1,4 +1,5 @@
 import kite as kite
+import os
 import requests
 from dateutil.rrule import rrule, WEEKLY, TH
 from flask import *
