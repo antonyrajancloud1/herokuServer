@@ -1,1 +1,1 @@
-web : gunicorn algoScalping:app
+web : gunicorn algoScalpingBuySell:app
