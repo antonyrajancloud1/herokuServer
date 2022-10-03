@@ -1,2 +1,1 @@
-web:gunicorn --chdir algoTrading algoScalpingBuySell:app
-web:gunicorn run:app
+web:gunicorn algoScalpingBuySell:app
