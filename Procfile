@@ -1,1 +1,1 @@
-worker: python algoScalpingBuySell.py
+web: python algoScalpingBuySell.py
