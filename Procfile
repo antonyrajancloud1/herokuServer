@@ -1,1 +1,1 @@
-web: python algoScalpingBuySell.py
+web: python algoScalpingBuySell.py --port=$PORT
