@@ -1,1 +1,1 @@
-web: gunicorn algoScalpingBuySell.py
+web: python3 algoScalpingBuySell.py
