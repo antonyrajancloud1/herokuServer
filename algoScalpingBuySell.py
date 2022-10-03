@@ -1,6 +1,6 @@
 from flask import Flask
 
-app = Flask(__name__)
+my_awesome_app = Flask(__name__)
 
 
 @my_awesome_app.route('/')
@@ -9,4 +9,4 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run()
+    my_awesome_app.run()
