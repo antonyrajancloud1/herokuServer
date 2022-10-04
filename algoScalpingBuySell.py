@@ -44,7 +44,7 @@ def getnsedata():
             'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
         print(url)
         global option_data
-        option_data = requests.session().get(url, headers=headers).json()
+        option_data = requests.Session().get(url, headers=headers).json()
         print(option_data)
         print(url)
         return getExpiryList()
