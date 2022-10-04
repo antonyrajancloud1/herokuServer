@@ -34,7 +34,8 @@ currentPremiumPlaced = ""
 # print(kite.positions())
 # print(kite.instruments("NFO"))
 # kite.orders()
-
+def __init__(self):
+    self.session = requests.session()
 
 def getnsedata():
     try:
@@ -44,14 +45,7 @@ def getnsedata():
             'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
         print(url)
         global option_data
-        #option_data = requests.Session().get(url, headers=headers).json()
-        expDates = {"records": {
-            "expiryDates": ["06-Oct-2022", "13-Oct-2022", "20-Oct-2022", "27-Oct-2022", "03-Nov-2022", "10-Nov-2022",
-                            "17-Nov-2022", "24-Nov-2022", "01-Dec-2022", "29-Dec-2022", "30-Mar-2023", "29-Jun-2023",
-                            "28-Sep-2023", "28-Dec-2023", "27-Jun-2024", "26-Dec-2024", "26-Jun-2025", "24-Dec-2025",
-                            "25-Jun-2026", "31-Dec-2026", "24-Jun-2027"]}}
-        option_data = json.dumps(expDates)
-        option_data = json.loads(option_data)
+        option_data = kite.http_get(url,headers)
         print(option_data)
         print(url)
         return getExpiryList()
@@ -61,6 +55,7 @@ def getnsedata():
 
 def getExpiryList():
     try:
+        print(option_data)
         if option_data != "":
             expiry_dates = option_data["records"]["expiryDates"]
             global current_expiry
@@ -74,7 +69,7 @@ def getExpiryList():
             # print(current_expiry)
             return current_expiry
     except BaseException as e:
-        print("exception in getExpiryList  -----  "+str(e))
+        print("exception in getExpiryList  -----  " + str(e))
 
 
 def getExistingOrders():
@@ -82,7 +77,7 @@ def getExistingOrders():
         print("Existing Orders")
         return kite.positions()
     except BaseException as e:
-        print("exception in getExistingOrders  -----  "+str(e))
+        print("exception in getExistingOrders  -----  " + str(e))
 
 
 def placeCallOption():
@@ -103,7 +98,7 @@ def placeCallOption():
         print(currentPremiumPlaced + "call Option")
         getLTPForOption("Buy")
     except BaseException as e:
-        print("exception in placeCallOption ---- "+str(e))
+        print("exception in placeCallOption ---- " + str(e))
 
 
 def placePutOption():
@@ -123,7 +118,7 @@ def placePutOption():
         print(currentPremiumPlaced + "Put Option")
         getLTPForOption("Buy")
     except BaseException as e:
-        print("exception in placePutOption ----- "+str(e))
+        print("exception in placePutOption ----- " + str(e))
 
 
 def exitOrder():
@@ -138,7 +133,7 @@ def exitOrder():
             print(currentPremiumPlaced + "exit order")
             getLTPForOption("exit")
     except BaseException as e:
-        print("exception in exitOrder ---- "+str(e))
+        print("exception in exitOrder ---- " + str(e))
 
 
 def getCurrentAtm():
@@ -149,7 +144,7 @@ def getCurrentAtm():
         print(niftySpot)
         return niftySpot
     except BaseException as e:
-        print("exception in getCurrentAtm  -----  "+str(e))
+        print("exception in getCurrentAtm  -----  " + str(e))
 
 
 def getTradingSymbol():
@@ -171,7 +166,7 @@ def getTradingSymbol():
             print(symbol)
         return symbol
     except BaseException as e:
-        print("exception in getTradingSymbol  -----  "+str(e))
+        print("exception in getTradingSymbol  -----  " + str(e))
 
 
 # print(getnsedata())
@@ -188,11 +183,12 @@ def getLTPForOption(action):
             print()
             with open('tradebook.txt', 'a') as file:
                 file.write(
-                    currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
+                    currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
+                        datetime.datetime.now()) + "\n")
             file.close()
             print("__________")
     except BaseException as e:
-        print("exception in getLTPForOption  -----  "+str(e))
+        print("exception in getLTPForOption  -----  " + str(e))
 
 
 def checkIfOrderExists():
@@ -211,10 +207,10 @@ def checkIfOrderExists():
             print("No day positions")
         print()
     except BaseException as e:
-        print("exception in checkIfOrderExists  -----  "+str(e))
+        print("exception in checkIfOrderExists  -----  " + str(e))
 
 
-#checkIfOrderExists()
+# checkIfOrderExists()
 
 
 @app.route('/')
