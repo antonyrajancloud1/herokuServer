@@ -34,8 +34,6 @@ currentPremiumPlaced = ""
 # print(kite.positions())
 # print(kite.instruments("NFO"))
 # kite.orders()
-def __init__(self):
-    self.session = requests.session()
 
 def getnsedata():
     try:
