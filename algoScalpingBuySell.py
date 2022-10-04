@@ -47,7 +47,6 @@ def getnsedata():
         global option_data
         option_data = kite.http_get(url,headers)
         print(option_data)
-        print(url)
         return getExpiryList()
     except BaseException as e:
         print("exception in getNseData  -----  " + str(e))
