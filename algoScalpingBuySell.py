@@ -43,7 +43,6 @@ def getnsedata():
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
             'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
         print(url)
-        print(requests.get("https://api.open-notify.org/astros.json"))
         global option_data
         #option_data = requests.Session().get(url, headers=headers).json()
         expDates = {"records": {
