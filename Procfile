@@ -1,1 +1,1 @@
-web: python3 algoScalpingBuySell.py -w 12 
+web: python3 algoScalpingBuySell.py
