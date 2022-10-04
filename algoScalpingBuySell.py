@@ -45,9 +45,14 @@ def getnsedata():
         print(url)
         print(requests.get("https://api.open-notify.org/astros.json"))
         global option_data
-        option_data = requests.request("POST",url,headers=headers)
-        print(requests.Session().get(url, headers=headers))
         #option_data = requests.Session().get(url, headers=headers).json()
+        expDates = {"records": {
+            "expiryDates": ["06-Oct-2022", "13-Oct-2022", "20-Oct-2022", "27-Oct-2022", "03-Nov-2022", "10-Nov-2022",
+                            "17-Nov-2022", "24-Nov-2022", "01-Dec-2022", "29-Dec-2022", "30-Mar-2023", "29-Jun-2023",
+                            "28-Sep-2023", "28-Dec-2023", "27-Jun-2024", "26-Dec-2024", "26-Jun-2025", "24-Dec-2025",
+                            "25-Jun-2026", "31-Dec-2026", "24-Jun-2027"]}}
+        option_data = json.dumps(expDates)
+        option_data = json.loads(option_data)
         print(option_data)
         print(url)
         return getExpiryList()
