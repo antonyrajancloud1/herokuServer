@@ -4,6 +4,8 @@ import requests
 from dateutil.rrule import rrule, WEEKLY, TH
 from flask import *
 import datetime;
+import pandas as pd
+
 
 from kiteconnect import KiteConnect
 
@@ -37,14 +39,22 @@ currentPremiumPlaced = ""
 
 def getnsedata():
     try:
-        url = "https://www.nseindia.com/api/option-chain-indices?symbol=" + index_global
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
-            'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
-        print(url)
+        #url = "https://www.nseindia.com/api/option-chain-indices?symbol=" + index_global
+        #headers = {
+        #    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
+        #    'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
+        #print(url)
         global option_data
-        option_data = kite.http_get(url,headers)
-        print(option_data)
+        #option_data = kite.http_get(url,headers)
+        #print(option_data)
+        df = pd.DataFrame(kite.instruments())
+        print(df)
+        df = df[(df.name == index_global)]
+        df = sorted(df.expiry.unique())
+        print(df)
+        option_data[0]=str( datetime.datetime.strptime(str(df[0]), '%Y-%m-%d').strftime('%d-%b-%Y'))
+        option_data[1]=str( datetime.datetime.strptime(str(df[1]), '%Y-%m-%d').strftime('%d-%b-%Y'))
+        #print(option_data)
         return getExpiryList()
     except BaseException as e:
         print("exception in getNseData  -----  " + str(e))
@@ -54,11 +64,11 @@ def getExpiryList():
     try:
         print(option_data)
         if option_data != "":
-            expiry_dates = option_data["records"]["expiryDates"]
+            #expiry_dates = option_data["records"]["expiryDates"]
             global current_expiry
-            current_expiry = expiry_dates[0]
+            current_expiry = option_data[0]
             print(current_expiry)
-            next_expiry = expiry_dates[1]
+            next_expiry = option_data[1]
 
             if (str(current_expiry).split("-")[1] != (str(next_expiry).split("-")[1])):
                 global is_monthly_expiry
@@ -208,8 +218,6 @@ def checkIfOrderExists():
 
 
 # checkIfOrderExists()
-
-
 @app.route('/')
 def index():
     return render_template('html/algoscalping.html')
