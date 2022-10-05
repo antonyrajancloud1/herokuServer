@@ -1,11 +1,13 @@
 import kite as kite
 import os
+
+import pytz
 import requests
 from dateutil.rrule import rrule, WEEKLY, TH
 from flask import *
 import datetime;
 import pandas as pd
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from kiteconnect import KiteConnect
 
@@ -16,7 +18,7 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "AWH05lTop527/coEPuXm63s7HOgijP1RfSc+y+ye4rbcOOuwN3Yoo7pz54wnnwtGdGbQcd5GgXGnIzzD0MoBh7xNZz20SjQtZJMsuZoPdWGPONppuInwHA=="
+enctoken = "cucLzNi3pvmDg7Dj7jEZdl2z+WiD0HgcTEF69fD7qdkkwj1EU/WgfLb64uKN/GluosmT+fILYGbyZ5Y+8E9zvHQyc+QP1Rz4E+gLKP9sEi3zKrnJtRNrCw=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
@@ -36,35 +38,27 @@ currentPremiumPlaced = ""
 # print(kite.positions())
 # print(kite.instruments("NFO"))
 # kite.orders()
-
 def getnsedata():
     try:
-        #url = "https://www.nseindia.com/api/option-chain-indices?symbol=" + index_global
-        #headers = {
-        #    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
-        #    'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'}
-        #print(url)
         global option_data
-        #option_data = kite.http_get(url,headers)
-        #print(option_data)
         df = pd.DataFrame(kite.instruments())
         print(df)
         df = df[(df.name == index_global)]
         df = sorted(df.expiry.unique())
         print(df)
-        option_data[0]=str( datetime.datetime.strptime(str(df[0]), '%Y-%m-%d').strftime('%d-%b-%Y'))
-        option_data[1]=str( datetime.datetime.strptime(str(df[1]), '%Y-%m-%d').strftime('%d-%b-%Y'))
-        #print(option_data)
-        return getExpiryList()
+        option_data[0] = str(datetime.datetime.strptime(str(df[0]), '%Y-%m-%d').strftime('%d-%b-%Y'))
+        option_data[1] = str(datetime.datetime.strptime(str(df[1]), '%Y-%m-%d').strftime('%d-%b-%Y'))
+        # print(option_data)
+        # return getExpiryList()
     except BaseException as e:
-        print("exception in getNseData  -----  " + str(e))
+        print("exception in getNseData Kite instruments  -----  " + str(e))
 
 
 def getExpiryList():
     try:
         print(option_data)
         if option_data != "":
-            #expiry_dates = option_data["records"]["expiryDates"]
+            # expiry_dates = option_data["records"]["expiryDates"]
             global current_expiry
             current_expiry = option_data[0]
             print(current_expiry)
@@ -156,7 +150,8 @@ def getCurrentAtm():
 
 def getTradingSymbol():
     try:
-        getnsedata()
+        # getnsedata()
+        getExpiryList()
         global symbol
         today = datetime.date.today()
         year = str(today.year)[2:4]
@@ -244,6 +239,18 @@ def exitCurrentOrder():
     exitOrder()
     return render_template('html/algoscalping.html', option=currentPremiumPlaced + "Order Exited")
 
+
+@app.route('/setexpiry', methods=["GET", "POST"])
+def getExpiry():
+    print("Expiry Called manually")
+    getnsedata()
+    return render_template('html/algoscalping.html', option="Expiry set" + "Order Exited")
+
+
+scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcutta'))
+scheduler.add_job(getnsedata, 'cron', day_of_week='fri', hour=9, minute=3)
+scheduler.start()
+getnsedata()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
