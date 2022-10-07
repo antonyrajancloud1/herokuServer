@@ -1,3 +1,4 @@
+import flask_sqlalchemy as SQLAlchemy
 import kite as kite
 import os
 
@@ -18,7 +19,7 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "xIEgaeRpXlSJrxEkMhUOSy/mWL/i6Ew8Y4OWSjO9Uoh1UeN8bbj3iLtspErsqwlgELe/PSrxsvVPA+2lme/OA0afT9nh93L1BJ8QwS0WTA35QTpFvNkHVw=="
+enctoken = "TglP9WXosZLK45fXeWlritod3uexPB33xlMzU7mWPweNf/2PRCVH3Exn+csJ9+vExpRrbWhdv2DYLn8iUn9HIAjJ21z8CM5DlFErcMgVFvfXSdVxgsU65A=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
@@ -38,6 +39,15 @@ currentPremiumPlaced = ""
 # print(kite.positions())
 # print(kite.instruments("NFO"))
 # kite.orders()
+def createDB():
+    app.config[
+        'DATABASE_URI'] = 'postgres://iviwocjdzufflu:283623116a454456582aaaa8f20f51e3506ee2905efa8bf604f3d6afbf7bb1f2@ec2-44-205-64-253.compute-1.amazonaws.com:5432/dcc2k6bc47hl94'
+    global db
+    db = SQLAlchemy(app)
+    db.Column("order_list", db.String(10000))
+    db.create_all()
+
+
 def getnsedata():
     try:
         global option_data
@@ -81,7 +91,7 @@ def getExistingOrders():
         print("exception in getExistingOrders  -----  " + str(e))
 
 
-def placeCallOption():
+def placeCallOption(message):
     try:
         exitOrder()
         # niftySpot = getCurrentAtm()
@@ -97,12 +107,12 @@ def placeCallOption():
                 currentPremiumPlaced = optionToBuy
         print(order_id)
         print(currentPremiumPlaced + "call Option")
-        getLTPForOption("Buy")
+        getLTPForOption("Buy  -- "+message)
     except BaseException as e:
         print("exception in placeCallOption ---- " + str(e))
 
 
-def placePutOption():
+def placePutOption(message):
     try:
         exitOrder()
         checkIfOrderExists()
@@ -117,7 +127,7 @@ def placePutOption():
                 currentPremiumPlaced = optionToBuy
         print(order_id)
         print(currentPremiumPlaced + "Put Option")
-        getLTPForOption("Buy")
+        getLTPForOption("Buy  -- "+message)
     except BaseException as e:
         print("exception in placePutOption ----- " + str(e))
 
@@ -178,15 +188,17 @@ def getTradingSymbol():
 # getCurrentAtm()
 def getLTPForOption(action):
     try:
-        print("__________")
-        ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
-        ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
-        #print()
-        #with open('tradebook.txt', 'a') as file:
-        #    file.write(currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
-        #    file.close()
-        print("tradebooklogs = "+currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
-        print("__________")
+        if currentPremiumPlaced != "":
+            print("__________")
+            ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
+            ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
+            print()
+            with open('tradebook.txt', 'a') as file:
+                file.write(currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
+                    datetime.datetime.now()) + "\n")
+            file.close()
+            print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
+            print("__________")
     except BaseException as e:
         print("exception in getLTPForOption  -----  " + str(e))
 
@@ -245,11 +257,46 @@ def getExpiry():
     return render_template('html/algoscalping.html', option="Expiry set" + "Order Exited")
 
 
+#######################
+@app.route('/buy/<message>', methods=["GET", "POST"])
+def buyCE1(message):
+    print("Entry CE")
+    placeCallOption(message)
+    return render_template('html/algoscalping.html', option=currentPremiumPlaced + "Order placed")
+
+
+@app.route('/sell/<message>', methods=["GET", "POST"])
+def buyPE1(message):
+    print("Entry PE")
+    placePutOption(message)
+    return render_template('html/algoscalping.html', option=currentPremiumPlaced + " Order placed")
+
+
+######################
+
+
 scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcutta'))
 scheduler.add_job(getnsedata, 'cron', day_of_week='fri', hour=9, minute=3)
 scheduler.start()
 getnsedata()
-
+#createDB()
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
+
+
+def getLTPForOption(action):
+    try:
+        print("__________")
+        ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
+        ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
+        print()
+        with open('tradebook.txt', 'a') as file:
+            file.write(
+                currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
+            file.close()
+        print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
+            datetime.datetime.now()) + "\n")
+        print("__________")
+    except BaseException as e:
+        print("exception in getLTPForOption  -----  " + str(e))
