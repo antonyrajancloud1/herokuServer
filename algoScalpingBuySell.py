@@ -18,7 +18,7 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "IXE80p90PA+/VMINIT+/mJy2PLcaw4p0UQ3lo4lnnJZK31bGdAxSyZHOVdpgn6c6af7Qgg0tQ8QMxDWdJ8C6P8rN6pUkhAyieqmUTQnXidL2Pst8EHG/Gw=="
+enctoken = "TglP9WXosZLK45fXeWlritod3uexPB33xlMzU7mWPweNf/2PRCVH3Exn+csJ9+vExpRrbWhdv2DYLn8iUn9HIAjJ21z8CM5DlFErcMgVFvfXSdVxgsU65A=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
@@ -84,7 +84,7 @@ def getExistingOrders():
 
 def placeCallOption(message):
     try:
-        exitOrder()
+        exitOrder(message)
         # niftySpot = getCurrentAtm()
         checkIfOrderExists()
         optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "CE"
@@ -105,7 +105,7 @@ def placeCallOption(message):
 
 def placePutOption(message):
     try:
-        exitOrder()
+        exitOrder(message)
         checkIfOrderExists()
         optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "PE"
         global currentPremiumPlaced
@@ -123,7 +123,7 @@ def placePutOption(message):
         print("exception in placePutOption ----- " + str(e))
 
 
-def exitOrder():
+def exitOrder(message):
     try:
         if currentPremiumPlaced != "":
             print(currentPremiumPlaced)
@@ -133,7 +133,7 @@ def exitOrder():
                                         order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
             print(order_id)
             print(currentPremiumPlaced + "exit order")
-            getLTPForOption("exit")
+            getLTPForOption("exit -- "+ message)
     except BaseException as e:
         print("exception in exitOrder ---- " + str(e))
 
