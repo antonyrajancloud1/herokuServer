@@ -182,11 +182,6 @@ def getLTPForOption(action):
         print("__________")
         ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
         ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
-        print()
-        with open('tradebook.txt', 'a') as file:
-            file.write(currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
-                datetime.datetime.now()) + "\n")
-        file.close()
         print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
         print("__________")
     except BaseException as e:
