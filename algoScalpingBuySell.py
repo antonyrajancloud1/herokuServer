@@ -1,4 +1,3 @@
-import flask_sqlalchemy as SQLAlchemy
 import kite as kite
 import os
 
@@ -39,14 +38,6 @@ currentPremiumPlaced = ""
 # print(kite.positions())
 # print(kite.instruments("NFO"))
 # kite.orders()
-def createDB():
-    app.config[
-        'DATABASE_URI'] = 'postgres://iviwocjdzufflu:283623116a454456582aaaa8f20f51e3506ee2905efa8bf604f3d6afbf7bb1f2@ec2-44-205-64-253.compute-1.amazonaws.com:5432/dcc2k6bc47hl94'
-    global db
-    db = SQLAlchemy(app)
-    db.Column("order_list", db.String(10000))
-    db.create_all()
-
 
 def getnsedata():
     try:
