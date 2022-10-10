@@ -18,7 +18,7 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "IXE80p90PA+/VMINIT+/mJy2PLcaw4p0UQ3lo4lnnJZK31bGdAxSyZHOVdpgn6c6af7Qgg0tQ8QMxDWdJ8C6P8rN6pUkhAyieqmUTQnXidL2Pst8EHG/Gw=="
+enctoken = "Cbz2KpZoDaVEmZcojG17u8q3c2fSghGAY5WSDoQCcaBAhPsPNUBbZ6RkKV8+HOEIsp4CZ+Y/9TxnVja2/SHR0TsUKeuXn7ajDc1N39r7504aFJib9tk81g=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
