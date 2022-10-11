@@ -18,14 +18,14 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-enctoken = "Cbz2KpZoDaVEmZcojG17u8q3c2fSghGAY5WSDoQCcaBAhPsPNUBbZ6RkKV8+HOEIsp4CZ+Y/9TxnVja2/SHR0TsUKeuXn7ajDc1N39r7504aFJib9tk81g=="
+enctoken = "T7uqVhlSRTlE3ZiNrRPA0Ee1JT3solXEumhQ79PgMmDShmkpg92RkdO7ZKxXF7lLFHl8inJdigjMSeqrxaLTpKDBegRjUXB2QDpgx0ApYsUJ4JxBRTXFKQ=="
 kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 option_data = {}
 current_expiry = ""
 index_global = "BANKNIFTY"
 is_monthly_expiry = False
-tradingsymbol = 'NSE:NIFTYBANK'
+tradingsymbol = 'NSE:NIFTY BANK'
 lots = 10
 qty = 50 * lots
 
@@ -141,6 +141,8 @@ def exitOrder(message):
 def getCurrentAtm():
     try:
         print(kite.ltp(tradingsymbol))
+
+
         niftyLTP = (kite.ltp(tradingsymbol)).get(tradingsymbol).get('last_price')
         print(niftyLTP)
         niftySpot = 100 * round(niftyLTP / 100)
