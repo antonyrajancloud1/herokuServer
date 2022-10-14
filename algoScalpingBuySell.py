@@ -23,6 +23,7 @@ enctoken = "T7uqVhlSRTlE3ZiNrRPA0Ee1JT3solXEumhQ79PgMmDShmkpg92RkdO7ZKxXF7lLFHl8
 #kite = KiteApp(enctoken=enctoken)
 # kite.set_access_token(att)
 kite = KiteApp(enctoken=apiToken)
+print(apiToken)
 # kite.set_access_token(att)
 option_data = {}
 current_expiry = ""
