@@ -17,9 +17,12 @@ from kite_trade import KiteApp
 att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
-# kite = KiteConnect(api_key=ap)
-enctoken = "lwYCsbLmCv97eTiz/hZWZdrfNZpuDXj7zvAMsCTc9RHhTThF/l9kPo/794ZLgv334IfmYI/lPZOqaQmI29IGGY4LhqTa7RE1hxTwxQe0/Us3vIf7WyAWbQ=="
-kite = KiteApp(enctoken=enctoken)
+
+apiToken = os.getenv("APITOKEN")
+enctoken = "T7uqVhlSRTlE3ZiNrRPA0Ee1JT3solXEumhQ79PgMmDShmkpg92RkdO7ZKxXF7lLFHl8inJdigjMSeqrxaLTpKDBegRjUXB2QDpgx0ApYsUJ4JxBRTXFKQ=="
+#kite = KiteApp(enctoken=enctoken)
+# kite.set_access_token(att)
+kite = KiteApp(enctoken=apiToken)
 # kite.set_access_token(att)
 option_data = {}
 current_expiry = ""
