@@ -90,12 +90,13 @@ def placeCallOption(message):
         #checkIfOrderExists()
         optionToBuy = getTradingSymbol() + str(getCurrentAtm()-200) + "CE"
         print(optionToBuy)
+        global currentPremiumPlaced
+        currentPremiumPlaced = optionToBuy
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
                                     transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
                                     order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
-                currentPremiumPlaced = optionToBuy
                 optionLtp = getLTPForOption("Option For LimitOrder")
                 target = int(optionLtp) + 10
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
