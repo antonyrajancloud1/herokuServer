@@ -18,10 +18,8 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-#enctoken = "lwYCsbLmCv97eTiz/hZWZdrfNZpuDXj7zvAMsCTc9RHhTThF/l9kPo/794ZLgv334IfmYI/lPZOqaQmI29IGGY4LhqTa7RE1hxTwxQe0/Us3vIf7WyAWbQ=="
 apiToken = os.getenv("APITOKEN")
 kite = KiteApp(enctoken=apiToken)
-print(apiToken)
 # kite.set_access_token(att)
 option_data = {}
 current_expiry = ""
@@ -89,7 +87,7 @@ def placeCallOption(message):
         exitOrder(message)
         # niftySpot = getCurrentAtm()
         checkIfOrderExists()
-        optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "CE"
+        optionToBuy = getTradingSymbol() + str(getCurrentAtm()-500) + "CE"
         print(optionToBuy)
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
                                     transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
@@ -109,7 +107,7 @@ def placePutOption(message):
     try:
         exitOrder(message)
         checkIfOrderExists()
-        optionToBuy = getTradingSymbol() + str(getCurrentAtm()) + "PE"
+        optionToBuy = getTradingSymbol() + str(getCurrentAtm()+500) + "PE"
         global currentPremiumPlaced
         currentPremiumPlaced = optionToBuy
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
