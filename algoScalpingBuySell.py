@@ -87,7 +87,7 @@ def placeCallOption(message):
     try:
         exitOrder(message)
         # niftySpot = getCurrentAtm()
-        checkIfOrderExists()
+        #checkIfOrderExists()
         optionToBuy = getTradingSymbol() + str(getCurrentAtm()-200) + "CE"
         print(optionToBuy)
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
@@ -114,7 +114,7 @@ def placeCallOption(message):
 def placePutOption(message):
     try:
         exitOrder(message)
-        checkIfOrderExists()
+        #checkIfOrderExists()
         optionToBuy = getTradingSymbol() + str(getCurrentAtm()+200) + "PE"
         global currentPremiumPlaced
         currentPremiumPlaced = optionToBuy
