@@ -202,6 +202,8 @@ def getLTPForOption(action):
         ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
         print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
         print("__________")
+        return ltp
+
     except BaseException as e:
         print("exception in getLTPForOption  -----  " + str(e))
 
@@ -290,18 +292,18 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
 
 
-def getLTPForOption(action):
-    try:
-        print("__________")
-        ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
-        ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
-        print()
-        with open('tradebook.txt', 'a') as file:
-            file.write(
-                currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
-            file.close()
-        print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
-            datetime.datetime.now()) + "\n")
-        print("__________")
-    except BaseException as e:
-        print("exception in getLTPForOption  -----  " + str(e))
+# def getLTPForOption(action):
+#     try:
+#         print("__________")
+#         ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
+#         ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
+#         print()
+#         with open('tradebook.txt', 'a') as file:
+#             file.write(
+#                 currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
+#             file.close()
+#         print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
+#             datetime.datetime.now()) + "\n")
+#         print("__________")
+#     except BaseException as e:
+#         print("exception in getLTPForOption  -----  " + str(e))
