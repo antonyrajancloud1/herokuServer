@@ -87,30 +87,19 @@ def placeCallOption(message):
     try:
         exitOrder(message)
         # niftySpot = getCurrentAtm()
-        # checkIfOrderExists()
-        optionToBuy = getTradingSymbol() + str(getCurrentAtm() - 200) + "CE"
+        checkIfOrderExists()
+        optionToBuy = getTradingSymbol() + str(getCurrentAtm()-200) + "CE"
         print(optionToBuy)
-        global currentPremiumPlaced
-        currentPremiumPlaced = optionToBuy
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
                                     transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
                                     order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
-                optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
-                
-                sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                              exchange=kite.EXCHANGE_NFO,
-                                              transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              price=target,
-                                              order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                print(sell_order)
-                print("target price ===")
-                print(target)
+                global currentPremiumPlaced
+                currentPremiumPlaced = optionToBuy
         print(order_id)
         print(currentPremiumPlaced + "call Option")
-        getLTPForOption("Buy  -- " + message)
+        getLTPForOption("Buy  -- "+message)
     except BaseException as e:
         print("exception in placeCallOption ---- " + str(e))
 
@@ -118,8 +107,8 @@ def placeCallOption(message):
 def placePutOption(message):
     try:
         exitOrder(message)
-        # checkIfOrderExists()
-        optionToBuy = getTradingSymbol() + str(getCurrentAtm() + 200) + "PE"
+        checkIfOrderExists()
+        optionToBuy = getTradingSymbol() + str(getCurrentAtm()+200) + "PE"
         global currentPremiumPlaced
         currentPremiumPlaced = optionToBuy
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
@@ -128,19 +117,9 @@ def placePutOption(message):
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
                 currentPremiumPlaced = optionToBuy
-                optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
-                sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                              exchange=kite.EXCHANGE_NFO,
-                                              transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              price=target,
-                                              order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                print(sell_order)
-                print("target price ===")
-                print(target)
         print(order_id)
         print(currentPremiumPlaced + "Put Option")
-        getLTPForOption("Buy  -- " + message)
+        getLTPForOption("Buy  -- "+message)
     except BaseException as e:
         print("exception in placePutOption ----- " + str(e))
 
@@ -155,7 +134,7 @@ def exitOrder(message):
                                         order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
             print(order_id)
             print(currentPremiumPlaced + "exit order")
-            getLTPForOption("exit -- " + message)
+            getLTPForOption("exit -- "+ message)
     except BaseException as e:
         print("exception in exitOrder ---- " + str(e))
 
@@ -204,10 +183,8 @@ def getLTPForOption(action):
         print("__________")
         ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
         ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
-        print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
-            datetime.datetime.now()) + "\n")
+        print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
         print("__________")
-        return ltp
     except BaseException as e:
         print("exception in getLTPForOption  -----  " + str(e))
 
@@ -288,24 +265,24 @@ scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcut
 scheduler.add_job(getnsedata, 'cron', day_of_week='fri', hour=9, minute=3)
 scheduler.start()
 getnsedata()
-# createDB()
+#createDB()
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
 
 
-# def getLTPForOption(action):
-#     try:
-#         print("__________")
-#         ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
-#         ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
-#         print()
-#         with open('tradebook.txt', 'a') as file:
-#             file.write(
-#                 currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
-#             file.close()
-#         print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
-#             datetime.datetime.now()) + "\n")
-#         print("__________")
-#     except BaseException as e:
-#         print("exception in getLTPForOption  -----  " + str(e))
+def getLTPForOption(action):
+    try:
+        print("__________")
+        ltp_str = json.dumps(kite.quote("NFO:" + currentPremiumPlaced))
+        ltp = json.loads(ltp_str)["NFO:" + currentPremiumPlaced]["last_price"]
+        print()
+        with open('tradebook.txt', 'a') as file:
+            file.write(
+                currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(datetime.datetime.now()) + "\n")
+            file.close()
+        print("tradebooklogs = " + currentPremiumPlaced + " \t " + action + " \t" + str(ltp) + "\t" + str(
+            datetime.datetime.now()) + "\n")
+        print("__________")
+    except BaseException as e:
+        print("exception in getLTPForOption  -----  " + str(e))
