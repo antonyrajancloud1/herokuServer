@@ -103,7 +103,7 @@ def placeCallOption(message):
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              trigger_price=target,
+                                              price=target,
                                               order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
                 print(sell_order)
                 print("target price ===")
@@ -133,7 +133,7 @@ def placePutOption(message):
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              trigger_price=target,
+                                              price=target,
                                               order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
                 print(sell_order)
                 print("target price ===")
