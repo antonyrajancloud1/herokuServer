@@ -94,15 +94,8 @@ def placeCallOption(message):
                                     order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
+                global currentPremiumPlaced
                 currentPremiumPlaced = optionToBuy
-                optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 20
-                sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                              exchange=kite.EXCHANGE_NFO,
-                                              transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              trigger_price=target,
-                                              order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                print(sell_order)
         print(order_id)
         print(currentPremiumPlaced + "call Option")
         getLTPForOption("Buy  -- "+message)
@@ -122,15 +115,8 @@ def placePutOption(message):
                                     order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
+                global currentPremiumPlaced
                 currentPremiumPlaced = optionToBuy
-                optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 20
-                sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                              exchange=kite.EXCHANGE_NFO,
-                                              transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                              trigger_price=target,
-                                              order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                print(sell_order)
         print(order_id)
         print(currentPremiumPlaced + "Put Option")
         getLTPForOption("Buy  -- "+message)
