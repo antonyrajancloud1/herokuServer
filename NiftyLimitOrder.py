@@ -28,9 +28,9 @@ current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
-lots = 1
+lots = os.getenv("LOTS")
 qty = 50 * lots
-
+targetPoints=os.getenv("TARGET")
 currentPremiumPlaced = ""
 currentOrderID = ""
 
@@ -93,7 +93,7 @@ def placeCallOption(message):
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
                 optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
+                target = int(optionLtp) + int(targetPoints)
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
@@ -127,7 +127,7 @@ def placePutOption(message):
             if order_id["data"]["order_id"] != "":
                 currentPremiumPlaced = optionToBuy
                 optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
+                target = int(optionLtp) + int(targetPoints)
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
@@ -261,7 +261,6 @@ scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcut
 scheduler.add_job(getnsedata, 'cron', day_of_week='fri', hour=9, minute=3)
 scheduler.start()
 getnsedata()
-checkIfOrderExists()
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
