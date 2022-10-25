@@ -27,7 +27,7 @@ current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
-lots = 10
+lots = 1
 qty = 50 * lots
 
 currentPremiumPlaced = ""
