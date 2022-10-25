@@ -153,9 +153,8 @@ def exitOrder(message):
             if currentOrderID != "":
                 print(currentPremiumPlaced)
                 order_id = kite.modify_order(order_id=currentOrderID, variety=kite.VARIETY_REGULAR,
-                                             exchange=kite.EXCHANGE_NFO,
-                                             transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                             order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+                                             quantity=qty,
+                                             order_type=kite.ORDER_TYPE_MARKET)
                 print(order_id)
                 print(currentPremiumPlaced + "exit order")
                 getLTPForOption("exit -- " + message)
