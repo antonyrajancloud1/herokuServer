@@ -33,8 +33,10 @@ qty = 50 * lots
 targetPoints=os.getenv("TARGET")
 currentPremiumPlaced = ""
 currentOrderID = ""
-
-
+print("lots")
+print(lots)
+print(targetPoints)
+print("++++++++")
 # Basic calls
 # print(kite.margins())
 # print(kite.orders())
@@ -109,7 +111,8 @@ def placeCallOption(message):
                 currentOrderID = sell_order["data"]["order_id"]
                 print("Sell order placed with target || Order ID = " + str(currentOrderID))
                 print("target price === " + str(target))
-
+        else:
+            print(order_id)
     except BaseException as e:
         print("exception in placeCallOption ---- " + str(e))
 
@@ -143,6 +146,8 @@ def placePutOption(message):
                 currentOrderID = sell_order["data"]["order_id"]
                 print("Sell order placed with target || Order ID = " + str(currentOrderID))
                 print("target price === " + str(target))
+        else:
+            print(order_id)
     except BaseException as e:
         print("exception in placePutOption ----- " + str(e))
 
