@@ -19,16 +19,18 @@ ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
 apiToken = os.getenv("APITOKEN")
-#apiToken = "lLXSc0iFdGl8tpb9HdA15NGioJ0ZwcpIqZaDbVHVAxWuBnPgCMT/boqYZGWPIuLnUjSdSHXtJpO+Rsy1xPW37dTzIMj5zpL5pwq/E4NM/4qkUBszwa+JIQ=="
+#apiToken = "cLW194txafCjyut1Zr7xMvuOXNwkSpZqZaphhqR58c+0c9DZlcBLvpRh4iOdyZFk2JiG4MoMn9LaO/JC43De+lnV8eUy8r0Tuj0oeNUxKpkaX+2/Y54Esg=="
 # kite.set_access_token(att)
 kite = KiteApp(enctoken=apiToken)
 
+isTradeAllowed= False
 option_data = {}
 current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
 lots = os.getenv("LOTS")
+#lots=1
 qty = 50 * int(lots)
 targetPoints=os.getenv("TARGET")
 currentPremiumPlaced = ""
@@ -259,7 +261,16 @@ def buyPE(message):
     print("Entry PE")
     placePutOption(message)
     return render_template('html/algoscalping.html', option=currentPremiumPlaced + " Order placed")
-
+@app.route('/exit/<message>', methods=["GET", "POST"])
+def exit(message):
+    exitOrder(message)
+    return render_template('html/algoscalping.html', option=currentPremiumPlaced + " Order placed")
+@app.route('/settoggle/<message>', methods=["GET", "POST"])
+def setToggle(message):
+    print("Set toggle")
+    isTradeAllowed=message
+    print(isTradeAllowed)
+    return render_template('html/algoscalping.html', option=isTradeAllowed)
 
 ######################
 scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcutta'))
