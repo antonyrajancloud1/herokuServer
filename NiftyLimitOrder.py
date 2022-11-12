@@ -19,6 +19,7 @@ ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
 apiToken = os.getenv("APITOKEN")
+#apiToken = "lLXSc0iFdGl8tpb9HdA15NGioJ0ZwcpIqZaDbVHVAxWuBnPgCMT/boqYZGWPIuLnUjSdSHXtJpO+Rsy1xPW37dTzIMj5zpL5pwq/E4NM/4qkUBszwa+JIQ=="
 # kite.set_access_token(att)
 kite = KiteApp(enctoken=apiToken)
 
@@ -27,12 +28,15 @@ current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
-lots = 10
-qty = 50 * lots
-
+lots = os.getenv("LOTS")
+qty = 50 * int(lots)
+targetPoints=os.getenv("TARGET")
 currentPremiumPlaced = ""
-currentOrderID=""
-
+currentOrderID = ""
+print("lots")
+print(lots)
+print(targetPoints)
+print("++++++++")
 # Basic calls
 # print(kite.margins())
 # print(kite.orders())
@@ -58,7 +62,7 @@ def getExpiryList():
         if option_data != "":
             global current_expiry
             current_expiry = option_data[0]
-            print("Current Expiry = "+str(current_expiry))
+            print("Current Expiry = " + str(current_expiry))
             next_expiry = option_data[1]
 
             if (str(current_expiry).split("-")[1] != (str(next_expiry).split("-")[1])):
@@ -72,25 +76,26 @@ def getExpiryList():
 def getExistingOrders():
     try:
         print("Existing Orders")
-        return kite.positions()
+        print(kite.orders())
+        return kite.orders()
     except BaseException as e:
         print("exception in getExistingOrders  -----  " + str(e))
 
 
 def placeCallOption(message):
     try:
-        checkIfOrderExists()
+        exitOrder(message)
         optionToBuy = getTradingSymbol() + str(getCurrentAtm() - 200) + "CE"
         global currentPremiumPlaced
         currentPremiumPlaced = optionToBuy
-        print("Current premium  = "+str(currentPremiumPlaced))
+        print("Current premium  = " + str(currentPremiumPlaced))
         order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
                                     transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
                                     order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
         if order_id["status"] == "success":
             if order_id["data"]["order_id"] != "":
                 optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
+                target = int(optionLtp) + int(targetPoints)
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
@@ -102,18 +107,19 @@ def placeCallOption(message):
                 getLTPForOption("Buy  -- " + message)
                 print("*** Sell Order Details ***")
                 print(sell_order)
-                global  currentOrderID
-                currentOrderID=sell_order["data"]["order_id"]
-                print("Sell order placed with target || Order ID = " +str(currentOrderID))
-                print("target price === "+str(target))
-
+                global currentOrderID
+                currentOrderID = sell_order["data"]["order_id"]
+                print("Sell order placed with target || Order ID = " + str(currentOrderID))
+                print("target price === " + str(target))
+        else:
+            print(order_id)
     except BaseException as e:
         print("exception in placeCallOption ---- " + str(e))
 
 
 def placePutOption(message):
     try:
-        checkIfOrderExists()
+        exitOrder(message)
         optionToBuy = getTradingSymbol() + str(getCurrentAtm() + 200) + "PE"
         global currentPremiumPlaced
         currentPremiumPlaced = optionToBuy
@@ -124,7 +130,7 @@ def placePutOption(message):
             if order_id["data"]["order_id"] != "":
                 currentPremiumPlaced = optionToBuy
                 optionLtp = getLTPForOption("Option For LimitOrder")
-                target = int(optionLtp) + 10
+                target = int(optionLtp) + int(targetPoints)
                 sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
                                               exchange=kite.EXCHANGE_NFO,
                                               transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
@@ -140,6 +146,8 @@ def placePutOption(message):
                 currentOrderID = sell_order["data"]["order_id"]
                 print("Sell order placed with target || Order ID = " + str(currentOrderID))
                 print("target price === " + str(target))
+        else:
+            print(order_id)
     except BaseException as e:
         print("exception in placePutOption ----- " + str(e))
 
@@ -147,14 +155,15 @@ def placePutOption(message):
 def exitOrder(message):
     try:
         if currentPremiumPlaced != "":
-            print(currentPremiumPlaced)
-            order_id = kite.place_order(tradingsymbol=currentPremiumPlaced, variety=kite.VARIETY_REGULAR,
-                                        exchange=kite.EXCHANGE_NFO,
-                                        transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                        order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
-            print(order_id)
-            print(currentPremiumPlaced + "exit order")
-            getLTPForOption("exit -- " + message)
+            if currentOrderID != "":
+                print(currentPremiumPlaced)
+                order_id = kite.modify_order(order_id=currentOrderID, variety=kite.VARIETY_REGULAR,
+                                             quantity=qty,
+                                             order_type=kite.ORDER_TYPE_MARKET)
+                print(order_id)
+                print(currentPremiumPlaced + "exit order")
+                getLTPForOption("exit -- " + message)
+
     except BaseException as e:
         print("exception in exitOrder ---- " + str(e))
 
@@ -162,9 +171,9 @@ def exitOrder(message):
 def getCurrentAtm():
     try:
         niftyLTP = (kite.ltp(tradingsymbol)).get(tradingsymbol).get('last_price')
-        print("Nifty current value = " +str(niftyLTP))
+        print("Nifty current value = " + str(niftyLTP))
         niftySpot = 50 * round(niftyLTP / 50)
-        print("Nifty spot value = " +str(niftySpot))
+        print("Nifty spot value = " + str(niftySpot))
         return niftySpot
     except BaseException as e:
         print("exception in getCurrentAtm  -----  " + str(e))
@@ -180,16 +189,18 @@ def getTradingSymbol():
         if is_monthly_expiry:
             month = str(current_expiry.split("-")[1]).upper()
             symbol = index_global + year + month
-            #print(symbol)
+            # print(symbol)
         else:
             month = str(current_expiry.split("-")[1]).upper()[0]
             next_thursday = rrule(freq=WEEKLY, dtstart=today, byweekday=TH, count=1)[0]
             date = str(next_thursday)[8:10]
             symbol = "" + index_global + year + month + date
-            #print(symbol)
+            # print(symbol)
         return symbol
     except BaseException as e:
         print("exception in getTradingSymbol  -----  " + str(e))
+
+
 def getLTPForOption(action):
     try:
         print("__________")
@@ -208,12 +219,13 @@ def checkIfOrderExists():
         position_string = json.dumps(getExistingOrders())
         position_json = json.loads(position_string)
         allDayPositions = position_json['day']
+        print(allDayPositions)
         if allDayPositions != []:
             for position in allDayPositions:
                 print(position['tradingsymbol'])
                 if position['tradingsymbol'] == currentPremiumPlaced:
                     if position['quantity'] >= 0:
-                        # print(position['last_price'])
+                        print(position['last_price'])
                         exitOrder("exit order")
         else:
             print("No day positions")
@@ -221,9 +233,11 @@ def checkIfOrderExists():
     except BaseException as e:
         print("exception in checkIfOrderExists  -----  " + str(e))
 
+
 @app.route('/')
 def index():
     return render_template('html/algoscalping.html')
+
 
 @app.route('/exit', methods=["GET", "POST"])
 def exitCurrentOrder():
