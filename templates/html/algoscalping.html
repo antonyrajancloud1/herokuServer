@@ -2,10 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Scalper</title>
+    <link rel="icon" href="https://kite.zerodha.com/static/images/browser-icons/favicon-32x32.png">
+    <link rel="stylesheet" href="/static/css/algoTrading.css">
+    <script src="/static/js/algoTrading.js" type="text/javascript"></script>
 </head>
 <body>
-<h1>Algo Scalping  </h1>
-<b>{{option}}</b>
+<div class="header p40 w500 flex flexC flexSB makeItCenter">
+        <div class="">Webhook Status</div>
+        <label class="switch">
+            <input type="checkbox" checked id="webhookStatus">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="buttons flexC flex flexSB makeItCenter p40">
+        <div class="buy p10 border" id="CE">Buy</div>
+        <div class="sell p10 border" id="PE">Sell</div>
+        <div class="exit p10 border" id="exitOrder">Exit</div>
+    </div>
+    <div class="dataTable mT10">
+     {{option}}
+    </div>
 </body>
 </html>
