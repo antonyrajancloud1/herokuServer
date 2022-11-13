@@ -6,10 +6,25 @@ $(document).on("click","#webhookStatus",function(){
 });
 $(document).on("click",function(event){
     var idOfTarget = event.target.id;
-    if(idOfTarget == "CE" || idOfTarget == "PE"|| idOfTarget == "exitOrder")
-    {
+    if(idOfTarget == "CE" || idOfTarget == "PE"|| idOfTarget == "exitOrder"){
         var httpMap = {"CE":"/buy/manual",    "PE":"/sell/manual",    "exitOrder":"/exit/manual"};
-        $.get(httpMap[idOfTarget]);
+        $.get(httpMap[idOfTarget],function(data,status){
+            if(status=="success"){
+                getValues();
+            }
+        });
     }
-
 });
+function getValues(){
+ $.get("/getvalues", function(data){
+               var order="";
+               if(data.currentPremiumPlaced=="") {
+                    order="No orders yet!";
+               }else{
+                     order=data.currentPremiumPlaced;
+               }
+               document.getElementById("order").innerHTML = order ;
+               document.getElementById("lots").innerHTML = data.lots;
+               document.getElementById("target").innerHTML = data.targetPoints;
+    });
+ }
