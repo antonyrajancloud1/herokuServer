@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/css/algoTrading.css">
     <script src="/static/js/algoTrading.js" type="text/javascript"></script>
 </head>
-<body>
+<body onload="getValues()" >
 <div class="header p40 w500 flex flexC flexSB makeItCenter">
         <div class="">Webhook Status</div>
         <label class="switch">
@@ -24,7 +24,10 @@
         <div class="exit p10 border" id="exitOrder">Exit</div>
     </div>
     <div class="dataTable mT10">
-     {{option}}
+        Current Order : <span id="order">  </span><br>
+        Lot Size :<span id="lots">  </span><br>
+        Target : <span id="target"> </span><br>
+
     </div>
 </body>
 </html>
