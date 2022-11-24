@@ -1,0 +1,24 @@
+body {background-color: #15202b;font-family: Lato, sans-serif;color:#e1e3e4;cursor:pointer;font-size: 1.125vw;}
+.flex{display:flex;}
+.flexC{align-items: center;}
+.flexSB{justify-content: space-evenly;}
+.p10{padding: 10px;}
+.makeItCenter{margin: 0 auto;}
+.w500{width: 20%;;}
+.mT10{margin-top: 10px;}
+.mB10{margin-bottom: 10px;}
+.p40{padding: 40px;;}
+.buy{background-color: #6ca534;}
+.sell{background-color: #EF5364;}
+.exit{background-color: #FF8300;}
+.buttons{width:50%;}
+.buttons div{border: 1px solid black;border-radius: 5px;width: 100px;text-align: center;}
+.switch {position: relative;display: inline-block;width: 60px;height: 34px;}
+.switch input {opacity: 0;width: 0;height: 0;}
+.slider {position: absolute;cursor: pointer;top: 0;left: 0;right: 0;bottom: 0;background-color: #ccc;-webkit-transition: .4s;transition: .4s;}
+.slider:before {position: absolute;content: "";height: 26px;width: 26px;left: 4px;bottom: 4px;background-color: white;-webkit-transition: .4s;transition: .4s;}
+input:checked + .slider {background-color: #2196F3;}
+input:focus + .slider {box-shadow: 0 0 1px #2196F3;}
+input:checked + .slider:before {-webkit-transform: translateX(26px);-ms-transform: translateX(26px);transform: translateX(26px);}
+.slider.round {border-radius: 34px;}
+.slider.round:before {border-radius: 50%;}

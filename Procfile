@@ -1,1 +1,1 @@
-web: python3 algoScalpingBuySell.py
+web: python3 NiftyLimitOrder.py
