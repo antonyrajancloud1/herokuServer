@@ -7,7 +7,7 @@ $(document).on("click","#webhookStatus",function(){
 $(document).on("click",function(event){
     var idOfTarget = event.target.id;
     if(idOfTarget == "CE" || idOfTarget == "PE"|| idOfTarget == "exitOrder"){
-        var httpMap = {"CE":"/buy/manual",    "PE":"/sell/manual",    "exitOrder":"/exit/manual"};
+        var httpMap = {"CE":"/buy",    "PE":"/sell",    "exitOrder":"/exit"};
         $.get(httpMap[idOfTarget],function(data,status){
             if(status=="success"){
                 getValues();
