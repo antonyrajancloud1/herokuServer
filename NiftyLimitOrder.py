@@ -2,15 +2,14 @@ import kite as kite
 import os
 
 import pytz
-import requests
 from dateutil.rrule import rrule, WEEKLY, TH
 from flask import *
-import datetime;
+import datetime
 import pandas as pd
 from apscheduler.schedulers.background import BackgroundScheduler
 from tradingview_ta import TA_Handler, Interval
 
-#from kiteconnect import KiteConnect
+# from kiteconnect import KiteConnect
 
 import acctkn
 from kite_trade import KiteApp
@@ -19,27 +18,30 @@ att = acctkn.att()
 ap = acctkn.atp()
 app = Flask(__name__)
 # kite = KiteConnect(api_key=ap)
-apiToken = os.getenv("APITOKEN")
-#apiToken = "qCEWQCOobhyxjVY/6k51kKdsj0uI7FCwKPdTsd+aDcxn+PX4puflynSFk+H58xRNsDFZUtCQbuwXeQETMoB6D97WVZwv/xpbeWkBWnd88iH87XJqSAwLFQ=="
+# apiToken = os.getenv("APITOKEN")
+apiToken = "9LBRla7cQGh74Mt5imAVALeSdarTy7+vxAjS7np8tgkn+zW8AiLgIvLvKncbr0nP8TbAxi5SK01AsDi52UExhNzXWQctk0yI7lZxBNx/bZ+VGrVnkz9rrA=="
 # kite.set_access_token(att)
 kite = KiteApp(enctoken=apiToken)
 
-isTradeAllowed= True
+isTradeAllowed = True
 option_data = {}
 current_expiry = ""
 index_global = "NIFTY"
 is_monthly_expiry = False
 tradingsymbol = 'NSE:NIFTY 50'
-lots = os.getenv("LOTS")
-#lots=1
+#lots = os.getenv("LOTS")
+lots=3
 qty = 50 * int(lots)
-targetPoints=os.getenv("TARGET")
+#targetPoints = os.getenv("TARGET")
+targetPoints=10
 currentPremiumPlaced = ""
 currentOrderID = ""
 print("lots")
 print(lots)
 print(targetPoints)
 print("++++++++")
+
+
 # Basic calls
 # print(kite.margins())
 # print(kite.orders())
@@ -89,40 +91,41 @@ def placeCallOption(message):
     try:
         if isTradeAllowed:
             exitOrder(message)
-            rsiValue = round(getCurrentRSI())
-            if rsiValue > 50:
-                optionToBuy = getTradingSymbol() + str(getCurrentAtm() - 200) + "CE"
-                global currentPremiumPlaced
-                currentPremiumPlaced = optionToBuy
-                print("Current premium  = " + str(currentPremiumPlaced))
-                order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
-                                            transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
-                                            order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
-                if order_id["status"] == "success":
-                    if order_id["data"]["order_id"] != "":
-                        optionLtp = getLTPForOption("Option For LimitOrder")
-                        target = int(optionLtp) + int(targetPoints)
-                        sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                                      exchange=kite.EXCHANGE_NFO,
-                                                      transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                                      price=target,
-                                                      order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                        print("*** Buy Order Details ***")
-                        print(order_id)
-                        print(currentPremiumPlaced + " call Option")
-                        getLTPForOption("Buy  -- " + message)
-                        print("*** Sell Order Details ***")
-                        print(sell_order)
-                        global currentOrderID
-                        currentOrderID = sell_order["data"]["order_id"]
-                        print("Sell order placed with target || Order ID = " + str(currentOrderID))
-                        print("target price === " + str(target))
-                else:
+            # rsiValue = round(getCurrentRSI())
+            # if rsiValue > 50:
+            optionToBuy = getTradingSymbol() + str(getCurrentAtm() - 200) + "CE"
+            global currentPremiumPlaced
+            currentPremiumPlaced = optionToBuy
+            print("Current premium  = " + str(currentPremiumPlaced))
+            order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
+                                        exchange=kite.EXCHANGE_NFO,
+                                        transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
+                                        order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+            if order_id["status"] == "success":
+                if order_id["data"]["order_id"] != "":
+                    optionLtp = getLTPForOption("Option For LimitOrder")
+                    target = int(optionLtp) + int(targetPoints)
+                    sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
+                                                  exchange=kite.EXCHANGE_NFO,
+                                                  transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
+                                                  price=target,
+                                                  order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
+                    print("*** Buy Order Details ***")
                     print(order_id)
+                    print(currentPremiumPlaced + " call Option")
+                    getLTPForOption("Buy  -- " + message)
+                    print("*** Sell Order Details ***")
+                    print(sell_order)
+                    global currentOrderID
+                    currentOrderID = sell_order["data"]["order_id"]
+                    print("Sell order placed with target || Order ID = " + str(currentOrderID))
+                    print("target price === " + str(target))
             else:
-                print("RSI value is not greater tha 50|| Current RSI = "+ str(rsiValue))
+                print(order_id)
+        # else:
+        #    print("RSI value is not greater tha 50|| Current RSI = "+ str(rsiValue))
         else:
-            print("Traing is blocked in server")
+            print('Trading is blocked in server')
     except BaseException as e:
         print("exception in placeCallOption ---- " + str(e))
 
@@ -131,40 +134,41 @@ def placePutOption(message):
     try:
         if isTradeAllowed:
             exitOrder(message)
-            rsiValue=round(getCurrentRSI())
-            if rsiValue<50:
-                optionToBuy = getTradingSymbol() + str(getCurrentAtm() + 200) + "PE"
-                global currentPremiumPlaced
-                currentPremiumPlaced = optionToBuy
-                order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR, exchange=kite.EXCHANGE_NFO,
-                                            transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
-                                            order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
-                if order_id["status"] == "success":
-                    if order_id["data"]["order_id"] != "":
-                        currentPremiumPlaced = optionToBuy
-                        optionLtp = getLTPForOption("Option For LimitOrder")
-                        target = int(optionLtp) + int(targetPoints)
-                        sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
-                                                      exchange=kite.EXCHANGE_NFO,
-                                                      transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
-                                                      price=target,
-                                                      order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
-                        print("*** Buy Order Details ***")
-                        print(order_id)
-                        print(currentPremiumPlaced + " Put Option")
-                        getLTPForOption("Buy  -- " + message)
-                        print("*** Sell Order Details ***")
-                        print(sell_order)
-                        global currentOrderID
-                        currentOrderID = sell_order["data"]["order_id"]
-                        print("Sell order placed with target || Order ID = " + str(currentOrderID))
-                        print("target price === " + str(target))
-                else:
+            # rsiValue = round(getCurrentRSI())
+            # if rsiValue < 50:
+            optionToBuy = getTradingSymbol() + str(getCurrentAtm() + 200) + "PE"
+            global currentPremiumPlaced
+            currentPremiumPlaced = optionToBuy
+            order_id = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
+                                        exchange=kite.EXCHANGE_NFO,
+                                        transaction_type=kite.TRANSACTION_TYPE_BUY, quantity=qty,
+                                        order_type=kite.ORDER_TYPE_MARKET, product=kite.PRODUCT_MIS)
+            if order_id["status"] == "success":
+                if order_id["data"]["order_id"] != "":
+                    currentPremiumPlaced = optionToBuy
+                    optionLtp = getLTPForOption("Option For LimitOrder")
+                    target = int(optionLtp) + int(targetPoints)
+                    sell_order = kite.place_order(tradingsymbol=optionToBuy, variety=kite.VARIETY_REGULAR,
+                                                  exchange=kite.EXCHANGE_NFO,
+                                                  transaction_type=kite.TRANSACTION_TYPE_SELL, quantity=qty,
+                                                  price=target,
+                                                  order_type=kite.ORDER_TYPE_LIMIT, product=kite.PRODUCT_MIS)
+                    print("*** Buy Order Details ***")
                     print(order_id)
+                    print(currentPremiumPlaced + " Put Option")
+                    getLTPForOption("Buy  -- " + message)
+                    print("*** Sell Order Details ***")
+                    print(sell_order)
+                    global currentOrderID
+                    currentOrderID = sell_order["data"]["order_id"]
+                    print("Sell order placed with target || Order ID = " + str(currentOrderID))
+                    print("target price === " + str(target))
             else:
-                print("Rsi is not less than 50 || Current RSI = " +str(rsiValue) )
+                print(order_id)
+        # else:
+        #    print("Rsi is not less than 50 || Current RSI = " + str(rsiValue))
         else:
-            print("Traing is blocked in server")
+            print("Trading is blocked in server")
     except BaseException as e:
         print("exception in placePutOption ----- " + str(e))
 
@@ -182,9 +186,8 @@ def exitOrder(message):
                 print(order_id)
                 print(currentPremiumPlaced + "exit order")
                 getLTPForOption("exit -- " + message)
-                currentPremiumPlaced="No Current Orders"
+                currentPremiumPlaced = "No Current Orders"
         print(currentPremiumPlaced)
-
 
     except BaseException as e:
         print("exception in exitOrder ---- " + str(e))
@@ -211,15 +214,17 @@ def getTradingSymbol():
         if is_monthly_expiry:
             month = str(current_expiry.split("-")[1]).upper()
             symbol = index_global + year + month
-            # print(symbol)
+            print(symbol)
         else:
-            #month = str(current_expiry.split("-")[1]).upper()[0]
-            currentMonth = datetime.datetime.now().month
-            month = str(currentMonth)
+            # month = str(current_expiry.split("-")[1]).upper()[0]
+            # currentMonth = datetime.datetime.now().month
+
+            monthList = dict(Jan=1, Feb=2, Mar=3, Apr=4, May=5, Jun=6, Jul=7, Aug=8, Sep=9, Oct=10, Nov=11, Dec=12)
+            month = str(current_expiry.split("-")[1])
             next_thursday = rrule(freq=WEEKLY, dtstart=today, byweekday=TH, count=1)[0]
             date = str(next_thursday)[8:10]
-            symbol = "" + index_global + year + month + date
-            # print(symbol)
+            symbol = "" + index_global + year + str(monthList[month]) + date
+            print(symbol)
         return symbol
     except BaseException as e:
         print("exception in getTradingSymbol  -----  " + str(e))
@@ -257,6 +262,7 @@ def checkIfOrderExists():
     except BaseException as e:
         print("exception in checkIfOrderExists  -----  " + str(e))
 
+
 def getCurrentRSI():
     try:
         index = TA_Handler(
@@ -270,6 +276,7 @@ def getCurrentRSI():
         return currentRsi
     except BaseException as e:
         print("exception in getCurrentRSI  -----  " + str(e))
+
 
 @app.route('/')
 def index():
@@ -296,6 +303,8 @@ def buyPE():
     print("Entry PE")
     placePutOption("PE")
     return render_template('html/algoscalping.html', option=currentPremiumPlaced + " Order placed")
+
+
 # @app.route('/exit', methods=["GET", "POST"])
 # def exit():
 #     exitOrder("exit")
@@ -304,17 +313,19 @@ def buyPE():
 def setToggle(message):
     print("Set toggle")
     global isTradeAllowed
-    if message=="false":
-        isTradeAllowed=False
-    elif message=="true":
-        isTradeAllowed=True
+    if message == "false":
+        isTradeAllowed = False
+    elif message == "true":
+        isTradeAllowed = True
     print(isTradeAllowed)
     return render_template('html/algoscalping.html', option=isTradeAllowed)
 
+
 @app.route('/getvalues', methods=["GET", "POST"])
 def getvalues():
-    allValues={"currentPremiumPlaced":currentPremiumPlaced,"lots":lots,"targetPoints":targetPoints}
+    allValues = {"currentPremiumPlaced": currentPremiumPlaced, "lots": lots, "targetPoints": targetPoints}
     return allValues
+
 
 ######################
 scheduler = BackgroundScheduler(daemon=True, timezone=pytz.timezone('Asia/Calcutta'))
