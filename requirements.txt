@@ -6,3 +6,4 @@ APScheduler==3.9.1
 kite==1.5.2
 kiteconnect==4.1.0
 pandas
+numpy
