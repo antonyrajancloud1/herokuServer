@@ -7,3 +7,4 @@ kite==1.5.2
 kiteconnect==4.1.0
 pandas
 numpy
+scipy
