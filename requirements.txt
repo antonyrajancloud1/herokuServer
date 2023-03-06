@@ -2,7 +2,7 @@ pytz==2022.4
 pytz-deprecation-shim==0.1.0.post0
 python-dateutil==2.8.2
 Flask==2.2.2
-pandas==1.5.0
 APScheduler==3.9.1
 kite==1.5.2
 kiteconnect==4.1.0
+pandas==1.5.0
